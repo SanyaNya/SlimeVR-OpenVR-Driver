@@ -16,12 +16,6 @@ namespace SlimeVRDriver {
         virtual std::string GetSerial() = 0;
 
         /**
-         * Runs any update logic for this device.
-         * Called once per frame.
-         */
-        virtual void Update() = 0;
-
-        /**
          * Returns the OpenVR device index.
          * This should be 0 for HMDs.
          * 

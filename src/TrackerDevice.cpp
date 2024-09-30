@@ -12,32 +12,6 @@ std::string SlimeVRDriver::TrackerDevice::GetSerial() {
     return serial_;
 }
 
-void SlimeVRDriver::TrackerDevice::Update() {
-    if (device_index_ == vr::k_unTrackedDeviceIndexInvalid) return;
-
-    // Check if this device was asked to be identified
-    auto events = GetDriver()->GetOpenVREvents();
-    for (auto event : events) {
-        // Note here, event.trackedDeviceIndex does not necessarily equal device_index_, not sure why, but the component handle will match so we can just use that instead
-        //if (event.trackedDeviceIndex == device_index_) {
-        if (event.eventType == vr::EVREventType::VREvent_Input_HapticVibration) {
-            if (event.data.hapticVibration.componentHandle == haptic_component_) {
-                did_vibrate_ = true;
-            }
-        }
-        //}
-    }
-
-    // Check if we need to keep vibrating
-    if (did_vibrate_) {
-        vibrate_anim_state_ += GetDriver()->GetLastFrameTime().count() / 1000.f;
-        if (vibrate_anim_state_ > 1.0f) {
-            did_vibrate_ = false;
-            vibrate_anim_state_ = 0.0f;
-        }
-    }
-}
-
 void SlimeVRDriver::TrackerDevice::PositionMessage(messages::Position &position) {
     if (device_index_ == vr::k_unTrackedDeviceIndexInvalid) return;
 

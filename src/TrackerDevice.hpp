@@ -23,7 +23,6 @@ namespace SlimeVRDriver {
 
         // Inherited via IVRDevice
         virtual std::string GetSerial() override;
-        virtual void Update() override;
         virtual vr::TrackedDeviceIndex_t GetDeviceIndex() override;
         virtual DeviceType GetDeviceType() override;
         virtual int GetDeviceId() override;
