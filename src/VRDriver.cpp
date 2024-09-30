@@ -150,7 +150,7 @@ void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
 
         arena_.Reset();
         
-        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     logger_->Log("Pose request thread exited");
 }
