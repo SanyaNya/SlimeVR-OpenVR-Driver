@@ -75,31 +75,6 @@ void SlimeVRDriver::TrackerDevice::PositionMessage(messages::Position &position)
     GetDriver()->GetDriverHost()->TrackedDevicePoseUpdated(device_index_, pose, sizeof(vr::DriverPose_t));
 }
 
-void SlimeVRDriver::TrackerDevice::BatteryMessage(messages::Battery &battery) {
-    if (this->device_index_ == vr::k_unTrackedDeviceIndexInvalid)
-        return;
-
-    // Get the properties handle
-    auto props = GetDriver()->GetProperties()->TrackedDeviceToPropertyContainer(this->device_index_);
-
-    vr::ETrackedPropertyError err;
-
-    // Set that the tracker reports battery level in case it has not already been set to true
-    // It's a given that the tracker supports reporting battery life because otherwise a BatteryMessage would not be received
-    if (vr::VRProperties()->GetBoolProperty(props, vr::Prop_DeviceProvidesBatteryStatus_Bool, &err) != true) {
-        vr::VRProperties()->SetBoolProperty(props, vr::Prop_DeviceProvidesBatteryStatus_Bool, true);
-    }
-
-    if (battery.is_charging()) {
-        vr::VRProperties()->SetBoolProperty(props, vr::Prop_DeviceIsCharging_Bool, true);
-    } else {
-        vr::VRProperties()->SetBoolProperty(props, vr::Prop_DeviceIsCharging_Bool, false);
-    } 
-    
-    // Set the battery Level; 0 = 0%, 1 = 100%
-    vr::VRProperties()->SetFloatProperty(props, vr::Prop_DeviceBatteryPercentage_Float, battery.battery_level());
-}
-
 void SlimeVRDriver::TrackerDevice::StatusMessage(messages::TrackerStatus &status) {
     if (device_index_ == vr::k_unTrackedDeviceIndexInvalid) return;
     

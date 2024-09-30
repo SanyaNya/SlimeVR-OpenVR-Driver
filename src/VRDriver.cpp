@@ -148,20 +148,6 @@ void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
         hmd_position->set_qw((float) q.w);
         bridge_->SendBridgeMessage(*message);
 
-        auto now = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - battery_sent_at_).count() > 100) {
-            vr::ETrackedPropertyError err;
-            if (vr::VRProperties()->GetBoolProperty(hmd_prop_container, vr::Prop_DeviceProvidesBatteryStatus_Bool, &err)) {
-                messages::Battery* hmdBattery = google::protobuf::Arena::CreateMessage<messages::Battery>(&arena_);
-                message->set_allocated_battery(hmdBattery);
-                hmdBattery->set_tracker_id(0);
-                hmdBattery->set_battery_level(vr::VRProperties()->GetFloatProperty(hmd_prop_container, vr::Prop_DeviceBatteryPercentage_Float, &err) * 100);
-                hmdBattery->set_is_charging(vr::VRProperties()->GetBoolProperty(hmd_prop_container, vr::Prop_DeviceIsCharging_Bool, &err));
-                bridge_->SendBridgeMessage(*message);
-            }
-            battery_sent_at_ = now;
-        }
-
         arena_.Reset();
         
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
@@ -198,12 +184,6 @@ void SlimeVRDriver::VRDriver::OnBridgeMessage(const messages::ProtobufMessage& m
             if (status_map.count(status.status())) {
                 logger_->Log("Tracker status id %i status %s", status.tracker_id(), status_map.at(status.status()).c_str());
             }
-        }
-    } else if (message.has_battery()) {
-        messages::Battery bat = message.battery();
-        auto device = this->devices_by_id_.find(bat.tracker_id());
-        if (device != this->devices_by_id_.end()) {
-            device->second->BatteryMessage(bat);
         }
     }
 }
