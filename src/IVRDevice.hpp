@@ -63,11 +63,6 @@ namespace SlimeVRDriver {
         */
         virtual void PositionMessage(messages::Position& position) = 0;
         
-        /**
-         * Updates device status from a received message.
-        */
-        virtual void StatusMessage(messages::TrackerStatus& status) = 0;
-
         // Inherited via ITrackedDeviceServerDriver
         virtual vr::EVRInitError Activate(uint32_t unObjectId) = 0;
         virtual void Deactivate() = 0;

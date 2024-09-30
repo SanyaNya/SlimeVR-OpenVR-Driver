@@ -157,33 +157,18 @@ void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
 
 void SlimeVRDriver::VRDriver::OnBridgeMessage(const messages::ProtobufMessage& message) {
     std::lock_guard<std::mutex> lock(devices_mutex_);
-    if (message.has_tracker_added()) {
-        messages::TrackerAdded ta = message.tracker_added();
-        switch(GetDeviceType(static_cast<TrackerRole>(ta.tracker_role()))) {
-            case DeviceType::TRACKER:
-                AddDevice(std::make_shared<TrackerDevice>(ta.tracker_serial(), ta.tracker_id(), static_cast<TrackerRole>(ta.tracker_role())));
-                break;
-        }
-    } else if (message.has_position()) {
+    if (message.has_position()) {
         messages::Position pos = message.position();
         auto device = devices_by_id_.find(pos.tracker_id());
         if (device != devices_by_id_.end()) {
             device->second->PositionMessage(pos);
         }
-    } else if (message.has_tracker_status()) {
-        messages::TrackerStatus status = message.tracker_status();
-        auto device = devices_by_id_.find(status.tracker_id());
-        if (device != devices_by_id_.end()) {
-            device->second->StatusMessage(status);
-            static const std::unordered_map<messages::TrackerStatus_Status, std::string> status_map = {
-                { messages::TrackerStatus_Status_OK, "OK" },
-                { messages::TrackerStatus_Status_DISCONNECTED, "DISCONNECTED" },
-                { messages::TrackerStatus_Status_ERROR, "ERROR" },
-                { messages::TrackerStatus_Status_BUSY, "BUSY" },
-            };
-            if (status_map.count(status.status())) {
-                logger_->Log("Tracker status id %i status %s", status.tracker_id(), status_map.at(status.status()).c_str());
-            }
+    } else if (message.has_tracker_added()) {
+        messages::TrackerAdded ta = message.tracker_added();
+        switch(GetDeviceType(static_cast<TrackerRole>(ta.tracker_role()))) {
+            case DeviceType::TRACKER:
+                AddDevice(std::make_shared<TrackerDevice>(ta.tracker_serial(), ta.tracker_id(), static_cast<TrackerRole>(ta.tracker_role())));
+                break;
         }
     }
 }

@@ -45,34 +45,10 @@ void SlimeVRDriver::TrackerDevice::PositionMessage(messages::Position &position)
     }
 
     // Notify SteamVR that pose was updated
+    pose.deviceIsConnected = true;
+    pose.poseIsValid = true;
     last_pose_ = pose;
-    GetDriver()->GetDriverHost()->TrackedDevicePoseUpdated(device_index_, pose, sizeof(vr::DriverPose_t));
-}
-
-void SlimeVRDriver::TrackerDevice::StatusMessage(messages::TrackerStatus &status) {
-    if (device_index_ == vr::k_unTrackedDeviceIndexInvalid) return;
     
-    vr::DriverPose_t pose = last_pose_;
-    switch (status.status()) {
-        case messages::TrackerStatus_Status_OK:
-            pose.deviceIsConnected = true;
-            pose.poseIsValid = true;
-            break;
-        case messages::TrackerStatus_Status_DISCONNECTED:
-            pose.deviceIsConnected = false;
-            pose.poseIsValid = false;
-            break;
-        case messages::TrackerStatus_Status_ERROR:
-        case messages::TrackerStatus_Status_BUSY:
-        default:
-            pose.deviceIsConnected = true;
-            pose.poseIsValid = false;
-            break;
-    }
-
-    // TODO: send position/rotation of 0 instead of last pose?
-    
-    last_pose_ = pose;
     GetDriver()->GetDriverHost()->TrackedDevicePoseUpdated(device_index_, pose, sizeof(vr::DriverPose_t));
 }
 
