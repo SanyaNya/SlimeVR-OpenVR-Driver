@@ -35,7 +35,6 @@ namespace SlimeVRDriver {
         // Inherited via IServerTrackedDeviceProvider
         virtual vr::EVRInitError Init(vr::IVRDriverContext* pDriverContext) override;
         virtual void Cleanup() override;
-        virtual void RunFrame() override;
         virtual bool ShouldBlockStandbyMode() override;
         virtual void EnterStandby() override;
         virtual void LeaveStandby() override;

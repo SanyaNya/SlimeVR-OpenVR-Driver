@@ -169,29 +169,6 @@ void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
     logger_->Log("Pose request thread exited");
 }
 
-void SlimeVRDriver::VRDriver::RunFrame() {
-    // Collect events
-    vr::VREvent_t event;
-    std::vector<vr::VREvent_t> events;
-    while (vr::VRServerDriverHost()->PollNextEvent(&event, sizeof(event))) {
-        events.push_back(event);
-    }
-    openvr_events_ = std::move(events);
-
-    // Update frame timing
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    frame_timing_ = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_frame_time_);
-    last_frame_time_ = now;
-
-    // Update devices
-    {
-        std::lock_guard<std::mutex> lock(devices_mutex_);
-        for (auto& device : devices_) {
-            device->Update();
-        }
-    }
-}
-
 void SlimeVRDriver::VRDriver::OnBridgeMessage(const messages::ProtobufMessage& message) {
     std::lock_guard<std::mutex> lock(devices_mutex_);
     if (message.has_tracker_added()) {
