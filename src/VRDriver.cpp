@@ -47,7 +47,7 @@ void SlimeVRDriver::VRDriver::Cleanup() {
 void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
     logger_->Log("Pose request thread started");
     while (!exiting_pose_request_thread_) {
-        if (!bridge_->IsConnected()) {
+        if (!bridge_->IsConnected()) [[unlikely]] {
             // If bridge not connected, assume we need to resend hmd tracker add message
             send_hmd_add_message_ = false;
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -56,7 +56,7 @@ void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
 
         messages::ProtobufMessage* message = google::protobuf::Arena::Create<messages::ProtobufMessage>(&arena_);
 
-        if (!send_hmd_add_message_) {
+        if (!send_hmd_add_message_) [[unlikely]] {
             // Send add message for HMD
             messages::TrackerAdded* tracker_added = google::protobuf::Arena::Create<messages::TrackerAdded>(&arena_);
             message->set_allocated_tracker_added(tracker_added);
@@ -81,8 +81,8 @@ void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
 
         vr::ETrackedPropertyError universe_error;
         uint64_t universe = vr::VRProperties()->GetUint64Property(hmd_prop_container, vr::Prop_CurrentUniverseId_Uint64, &universe_error);
-        if (universe_error == vr::ETrackedPropertyError::TrackedProp_Success) {
-            if (!current_universe_.has_value() || current_universe_.value().first != universe) {
+        if (universe_error == vr::ETrackedPropertyError::TrackedProp_Success) [[likely]] {
+            if (!current_universe_.has_value() || current_universe_.value().first != universe) [[unlikely]] {
                 auto result = SearchUniverses(universe);
                 if (result.has_value()) {
                     current_universe_.emplace(universe, result.value());
@@ -157,13 +157,13 @@ void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
 
 void SlimeVRDriver::VRDriver::OnBridgeMessage(const messages::ProtobufMessage& message) {
     std::lock_guard<std::mutex> lock(devices_mutex_);
-    if (message.has_position()) {
+    if (message.has_position()) [[likely]] {
         messages::Position pos = message.position();
         auto device = devices_by_id_.find(pos.tracker_id());
         if (device != devices_by_id_.end()) {
             device->second->PositionMessage(pos);
         }
-    } else if (message.has_tracker_added()) {
+    } else if (message.has_tracker_added()) [[unlikely]] {
         messages::TrackerAdded ta = message.tracker_added();
         switch(GetDeviceType(static_cast<TrackerRole>(ta.tracker_role()))) {
             case DeviceType::TRACKER:
