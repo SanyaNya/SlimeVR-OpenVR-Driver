@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.0.0)
 
 #if (NOT DEFINED VCPKG_TARGET_TRIPLET)
     if(WIN32)
