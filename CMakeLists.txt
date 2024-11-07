@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 3.0.0)
     endif()
 #endif()
 
+set (CMAKE_CXX_STANDARD 20)
+
 # If the toolchain is already defined, do not attempt to find it
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     # If the VCPKG_ROOT environment variable is not defined, try to automatically define it from AppData/home
@@ -32,10 +34,6 @@ endif()
 
 project(SlimeVR-OpenVR-Driver VERSION 0.2.0)
 
-set (CMAKE_CXX_STANDARD 20)
-
-include(cflags.cmake)
-
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(DRIVER_NAME "slimevr")
 
@@ -54,8 +52,12 @@ endif()
 
 if(WIN32)
     set(PLATFORM_NAME "win")
+    add_compile_options(/w /O2 /GL)
+    add_link_options(/LTCG)
 elseif(UNIX AND NOT APPLE)
     set(PLATFORM_NAME "linux")
+    add_compile_options(-w -O3 -flto)
+    add_link_options(-flto)
 elseif(APPLE)
     set(PLATFORM_NAME "osx")
 endif()
