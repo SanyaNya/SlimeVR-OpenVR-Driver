@@ -2,7 +2,7 @@
 # Debug: disabled optimization, warnings, sanitizers
 # Release: max optimization and LTO, warnings disabled
 
-if(MSVC)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   add_compile_options(
     $<$<CONFIG:Debug>:/Od>
     $<$<CONFIG:Debug>:/Zi>
