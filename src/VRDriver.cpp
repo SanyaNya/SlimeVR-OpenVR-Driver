@@ -54,11 +54,11 @@ void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
             continue;
         }
 
-        messages::ProtobufMessage* message = google::protobuf::Arena::CreateMessage<messages::ProtobufMessage>(&arena_);
+        messages::ProtobufMessage* message = google::protobuf::Arena::Create<messages::ProtobufMessage>(&arena_);
 
         if (!send_hmd_add_message_) {
             // Send add message for HMD
-            messages::TrackerAdded* tracker_added = google::protobuf::Arena::CreateMessage<messages::TrackerAdded>(&arena_);
+            messages::TrackerAdded* tracker_added = google::protobuf::Arena::Create<messages::TrackerAdded>(&arena_);
             message->set_allocated_tracker_added(tracker_added);
             tracker_added->set_tracker_id(0);
             tracker_added->set_tracker_role(TrackerRole::HMD);
@@ -66,7 +66,7 @@ void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
             tracker_added->set_tracker_name("HMD");
             bridge_->SendBridgeMessage(*message);
 
-            messages::TrackerStatus* tracker_status = google::protobuf::Arena::CreateMessage<messages::TrackerStatus>(&arena_);
+            messages::TrackerStatus* tracker_status = google::protobuf::Arena::Create<messages::TrackerStatus>(&arena_);
             message->set_allocated_tracker_status(tracker_status);
             tracker_status->set_tracker_id(0);
             tracker_status->set_status(messages::TrackerStatus_Status::TrackerStatus_Status_OK);
@@ -135,7 +135,7 @@ void SlimeVRDriver::VRDriver::RunPoseRequestThread() {
             pos.v[2] = pos_z;
         }
 
-        messages::Position* hmd_position = google::protobuf::Arena::CreateMessage<messages::Position>(&arena_);
+        messages::Position* hmd_position = google::protobuf::Arena::Create<messages::Position>(&arena_);
         message->set_allocated_position(hmd_position);
         hmd_position->set_tracker_id(0);
         hmd_position->set_data_source(messages::Position_DataSource_FULL);
